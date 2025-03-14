@@ -1,0 +1,40 @@
+site_name: ''
+site_url: https://blog.neutron-it.fr
+theme:
+  name: material
+  language: fr
+  features:
+  #  - navigation.tabs
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - toc.follow
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  palette:
+    scheme: neutron-it
+plugins:
+  - meta
+  - search
+  - tags
+docs_dir: content
+extra_css:
+  - stylesheets/extra.css
+markdown_extensions:
+  - attr_list
+  - toc:
+      toc_depth: "2-3"
+extra:
+  # analytics:
+  #   provider: google
+  #   property: !ENV GOOGLE_ANALYTICS_KEY
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/neutron-IT-organization
+    - icon: fontawesome/brands/docker
+      link: https://quay.io/neutron-it
+  generator: false
+copyright: Copyright &copy; 2024 - 2025 Neutron IT
