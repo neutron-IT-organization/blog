@@ -30,7 +30,7 @@ Pour commencer, créez un namespace dédié à DeepSeek sur OpenShift :
 oc create namespace deepseek
 ```
 
-## 2. COnfigurez les SCC 
+## 2. Configurez les SCC 
 
 Attribuez la SCC (Security Context Constraint) `privileged` au service account ci-dessous dans le namespace `deepseek` :
 
