@@ -26,17 +26,17 @@ Pour créer notre Operator, nous devons d'abord installer l'Operator SDK. Voici 
 
 1. **Télécharger et installer l'Operator SDK :**
 
-   ```bash
-   curl -LO https://github.com/operator-framework/operator-sdk/releases/download/v1.25.0/operator-sdk_linux_amd64
-   chmod +x operator-sdk_linux_amd64
-   sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
-   ```
+```bash
+curl -LO https://github.com/operator-framework/operator-sdk/releases/download/v1.25.0/operator-sdk_linux_amd64
+chmod +x operator-sdk_linux_amd64
+sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
+```
 
 2. **Vérifier l'installation :**
 
-   ```bash
-   operator-sdk version
-   ```
+```bash
+operator-sdk version
+```
 
 ### Droits Administratifs sur le Cluster OpenShift
 
