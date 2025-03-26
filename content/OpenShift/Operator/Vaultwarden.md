@@ -177,7 +177,7 @@ spec:
 ![Vaultwarden-instance](./img/vaultwarden-instance.png)
 
 Maintenant, vous pouvez vous rendre dans la section "Console Links" de l'interface OpenShift, 
-![consoleLink](./img/consoleLink.png)
+![consoleLink](./img/consoleLink.png){: .scaled-image }
 
 cliquer sur "Vaultwarden" et accéder directement à l'interface de Vaultwarden pour commencer à l'utiliser.
 
