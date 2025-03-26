@@ -10,7 +10,7 @@ tags:
 
 ## Introduction
 
-Les Operators sont devenus un élément essentiel dans l'écosystème Kubernetes, permettant d'automatiser les tâches de gestion des applications. Dans cet article, nous allons créer un Operator pour Vaultwarden, une implémentation open-source de Bitwarden, et le déployer sur OpenShift. Pour cela, nous utiliserons l'Operator SDK avec le plugin Helm.
+Les Operators sont devenus un élément essentiel dans l'écosystème Kubernetes, permettant d'automatiser les tâches de gestion des applications. Dans cet article, nous allons créer un Operator pour Vaultwarden, une implémentation en Rust de Bitwarden, et le déployer sur OpenShift. Pour cela, nous utiliserons l'Operator SDK avec le plugin Helm.
 
 ![Vaultwarden](./img/vaultwarden-dashboard-ui.png)
 
@@ -38,9 +38,9 @@ sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
 operator-sdk version
 ```
 
-### Droits Administratifs sur le Cluster OpenShift
+### Droits Administrateurs sur le Cluster OpenShift
 
-Assurez-vous d'avoir les droits administratifs nécessaires sur votre cluster OpenShift pour créer et gérer des Operators.
+Assurez-vous d'avoir les droits administrateurs nécessaires sur votre cluster OpenShift pour créer et gérer des Operators.
 
 ## Étapes de Création de l'Operator
 
@@ -54,7 +54,7 @@ operator-sdk init --domain neutron-it --plugins helm --group vaultwarden --versi
 
 ### Configurer les Rôles RBAC
 
-Modifiez le fichier `config/rbac/role.yaml` pour accorder les droits nécessaires à l'Operator. Dans notre cas, nous allons donner des droits administratifs au `manager-role`.
+Modifiez le fichier `config/rbac/role.yaml` pour accorder les droits nécessaires à l'Operator. Dans notre cas, nous allons donner des droits administrateurs au `manager-role`.
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
