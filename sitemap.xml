@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://blog.neutron-it.fr/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/tags/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/BootC/MinIO/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/OpenShift/Configuration/openshift-image-registry/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/OpenShift/Intelligence-Artificielle/DeepSeek/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/OpenShift/Intelligence-Artificielle/SharedGPU/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/OpenShift/Operator/Vaultwarden/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.neutron-it.fr/OpenShift/RealTime/RealTime/</loc>
+         <lastmod>2025-03-26</lastmod>
+    </url>
+</urlset>
