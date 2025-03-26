@@ -176,10 +176,7 @@ spec:
 
 ![Vaultwarden-instance](./img/vaultwarden-instance.png)
 
-Maintenant, vous pouvez vous rendre dans la section "Console Links" de l'interface OpenShift, 
-![consoleLink](./img/consoleLink.png){: .scaled-image }
-
-cliquer sur "Vaultwarden" et accéder directement à l'interface de Vaultwarden pour commencer à l'utiliser.
+Maintenant, vous pouvez vous rendre dans la section "Console Links" de l'interface OpenShift, cliquer sur "Vaultwarden" et accéder directement à l'interface de Vaultwarden pour commencer à l'utiliser.
 
 ![vaultwarden-dashboard-ui](./img/vaultwarden-dashboard-ui.png)
 
@@ -189,5 +186,4 @@ En suivant ces étapes, vous avez créé et déployé un Operator pour Vaultward
 
 ---
 
-**Auteur : [lorian EVEN](https://www.linkedin.com/in/florian-even/)**
-**Auteur : Florian EVEN**
+**Auteur : [Florian EVEN](https://www.linkedin.com/in/florian-even/)**
