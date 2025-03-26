@@ -24,7 +24,7 @@ Vaultwarden est une alternative open-source à Bitwarden, un gestionnaire de mot
 
 Pour créer notre Operator, nous devons d'abord installer l'Operator SDK. Voici comment procéder :
 
-1. **Télécharger et installer l'Operator SDK :**
+**Télécharger et installer l'Operator SDK :**
 
 ```bash
 curl -LO https://github.com/operator-framework/operator-sdk/releases/download/v1.25.0/operator-sdk_linux_amd64
@@ -32,7 +32,7 @@ chmod +x operator-sdk_linux_amd64
 sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
 ```
 
-2. **Vérifier l'installation :**
+**Vérifier l'installation :**
 
 ```bash
 operator-sdk version
@@ -107,12 +107,12 @@ operator-sdk run bundle "quay.io/neutron-it/vaultwarden-operator-bundle:v0.0.6"
 
 ## Déploiement de VaultwardenApp
 
-1. **Accédez à l'interface utilisateur d'OpenShift.**
-2. **Allez dans la section "Installed Operators".**
+**Accédez à l'interface utilisateur d'OpenShift.**
+**Allez dans la section "Installed Operators".**
 
 ![Vaultwarden-ui](./img/vaultwarden-ui.png)
 
-3. **Créez une instance de `VaultwardenApp` avec la configuration suivante :**
+**Créez une instance de `VaultwardenApp` avec la configuration suivante :**
 
 ```yaml
 apiVersion: vaultwarden.neutron-it/v2alpha1
