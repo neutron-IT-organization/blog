@@ -12,6 +12,8 @@ tags:
 
 Les Operators sont devenus un élément essentiel dans l'écosystème Kubernetes, permettant d'automatiser les tâches de gestion des applications. Dans cet article, nous allons créer un Operator pour Vaultwarden, une implémentation open-source de Bitwarden, et le déployer sur OpenShift. Pour cela, nous utiliserons l'Operator SDK avec le plugin Helm.
 
+![Vaultwarden](./img/vaultwarden-dashboard-ui.png)
+
 ## Qu'est-ce que Vaultwarden ?
 
 Vaultwarden est une alternative open-source à Bitwarden, un gestionnaire de mots de passe populaire. Il permet aux utilisateurs d'auto-héberger leur propre serveur de gestion de mots de passe, offrant ainsi un contrôle total sur leurs données sensibles.
@@ -107,6 +109,9 @@ operator-sdk run bundle "quay.io/neutron-it/vaultwarden-operator-bundle:v0.0.6"
 
 1. **Accédez à l'interface utilisateur d'OpenShift.**
 2. **Allez dans la section "Installed Operators".**
+
+![Vaultwarden-ui](./img/vaultwarden-ui.png)
+
 3. **Créez une instance de `VaultwardenApp` avec la configuration suivante :**
 
 ```yaml
@@ -114,7 +119,7 @@ apiVersion: vaultwarden.neutron-it/v2alpha1
 kind: VaultwardenApp
 metadata:
   name: vaultwardenapp-sample
-  namespace: florian-ns
+  namespace: neutron-it-ns
 spec:
   config:
     DATA_FOLDER: /data
@@ -123,14 +128,14 @@ spec:
     ROCKET_WORKERS: '10'
     SHOW_PASSWORD_HINT: 'false'
     SIGNUPS_ALLOWED: 'true'
-    SMTP_FROM: vaultwarden@neutron-it.fr
+    SMTP_FROM: demonstration@yourdomain.fr
     SMTP_HOST: aspmx.l.google.com
     SMTP_PORT: '25'
     SMTP_SECURITY: 'off'
     WEBSOCKET_ENABLED: 'true'
     WEB_VAULT_ENABLED: 'true'
     YUBICO_CLIENT_ID: '123123'
-    YUBICO_SECRET_KEY: Vsdfsew434fsdfsdfsdf=
+    YUBICO_SECRET_KEY: 12345678
   consoleLink:
     enabled: true
     imageURL: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Vaultwarden_icon.svg'
@@ -166,8 +171,17 @@ spec:
     type: ClusterIP
   serviceAccount:
     create: true
-    name: bitwarden
+    name: vaultwarden
 ```
+
+![Vaultwarden-instance](./img/vaultwarden-instance.png)
+
+Maintenant, vous pouvez vous rendre dans la section "Console Links" de l'interface OpenShift, 
+![consoleLink](./img/consoleLink.png)
+
+cliquer sur "Vaultwarden" et accéder directement à l'interface de Vaultwarden pour commencer à l'utiliser.
+
+![vaultwarden-dashboard-ui](./img/vaultwarden-dashboard-ui.png)
 
 ## Conclusion
 
@@ -175,4 +189,5 @@ En suivant ces étapes, vous avez créé et déployé un Operator pour Vaultward
 
 ---
 
+**Auteur : [lorian EVEN](https://www.linkedin.com/in/florian-even/)**
 **Auteur : Florian EVEN**
