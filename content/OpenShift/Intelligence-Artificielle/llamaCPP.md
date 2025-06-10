@@ -22,6 +22,8 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants :
 2. **MinIO** : Un serveur MinIO configuré pour stocker vos modèles.
 3. **Outils CLI** : `oc` (OpenShift CLI) et `kubectl` pour interagir avec votre cluster.
 
+NOTE: Toute les actions ci-dessous seront réalisées dans le namespace myllm. Si vous ré
+
 
 ## Partie 1 : Téléchargement et Upload du Modèle
 
@@ -34,6 +36,8 @@ Pour commencer, téléchargez le modèle de votre choix depuis Hugging Face. Dan
 wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF/resolve/main/mistral-7b-instruct-v0.1.Q4_K_M.gguf?download=true
 ```
 
+![mistral-7b](./img/mistral-7b-gguf.png)
+
 ### Upload du Modèle dans MinIO
 
 Une fois le modèle téléchargé et converti, vous devez l'uploader dans votre bucket MinIO. Utilisez l'interface utilisateur de MinIO ou l'outil de ligne de commande `mc` pour uploader le modèle.
@@ -41,6 +45,8 @@ Une fois le modèle téléchargé et converti, vous devez l'uploader dans votre 
 ```bash
 mc cp /path/to/your/model/mistral-7b-instruct-v0.2.Q4_K_M.gguf myminio/mybucket/models/
 ```
+
+![minio-mistral](./img/minio-mistral.png)
 
 ## Partie 2 : Déploiement du Pod Llama.cpp
 
@@ -146,7 +152,7 @@ spec:
 
 ### Test du Service
 
-Vous pouvez tester le service en utilisant `curl` depuis un pod :
+Vous pouvez tester le service en utilisant `curl` depuis le pod créé:
 
 ```bash
 curl --location 'https://localhost:8080/v1/chat/completions' \
@@ -164,6 +170,8 @@ curl --location 'https://localhost:8080/v1/chat/completions' \
   ]
 }'
 ```
+
+![test-inference](./img/test-inference.png)
 
 ## Partie 3 : Déploiement de l'Interface Utilisateur
 
@@ -197,7 +205,7 @@ spec:
               protocol: TCP
           env:
             - name: MODEL_ENDPOINT
-              value: 'http://simplified-service.myrag.svc.cluster.local:8080'
+              value: 'http://simplified-service.myllm.svc.cluster.local:8080'
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always
@@ -250,6 +258,8 @@ spec:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
 ```
+
+![test-with-ui](./img/test-ui.png)
 
 ### Exemple de Question
 
