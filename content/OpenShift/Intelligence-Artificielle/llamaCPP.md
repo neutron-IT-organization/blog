@@ -8,6 +8,8 @@ tags:
 
 # Rendre un Modèle Disponible en Inférence sur OpenShift avec Llama.cpp
 
+![Llama cpp archi](./img/architecture-llama-cpp.png)
+
 ## Introduction
 
 Dans cet article, nous allons explorer comment déployer un modèle de langage pour l'inférence sur OpenShift en utilisant Llama.cpp. Notre architecture globale comprendra un serveur MinIO pour rendre les modèles accessibles via S3, un pod Kubernetes avec un init container pour télécharger le modèle, et un conteneur principal exécutant Llama.cpp pour rendre le modèle disponible pour l'inférence. Enfin, nous déployerons une interface utilisateur pour interagir avec le modèle.
@@ -18,30 +20,18 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants :
 
 1. **Un cluster OpenShift** : Assurez-vous d'avoir accès à un cluster OpenShift.
 2. **MinIO** : Un serveur MinIO configuré pour stocker vos modèles.
-3. **Llama.cpp** : Assurez-vous d'avoir Llama.cpp installé et configuré pour votre modèle.
-4. **Outils CLI** : `oc` (OpenShift CLI) et `kubectl` pour interagir avec votre cluster.
-5. **Modèle en format GGUF** : Téléchargez et convertissez votre modèle préféré (par exemple, Mistral) au format GGUF.
+3. **Outils CLI** : `oc` (OpenShift CLI) et `kubectl` pour interagir avec votre cluster.
 
-### Installation de Llama.cpp
-
-Pour installer Llama.cpp, suivez les instructions sur le dépôt GitHub officiel. Vous aurez besoin de `git`, `make`, et d'autres outils de développement pour compiler Llama.cpp.
-
-```bash
-git clone https://github.com/ggerganov/llama.cpp.git
-cd llama.cpp
-make
-```
 
 ## Partie 1 : Téléchargement et Upload du Modèle
 
 ### Télécharger Mistral depuis Hugging Face
 
-Pour commencer, téléchargez le modèle Mistral depuis Hugging Face. Vous pouvez utiliser le script Python suivant pour télécharger et convertir le modèle au format GGUF.
+Pour commencer, téléchargez le modèle de votre choix depuis Hugging Face. Dans notre tutoriel nous utiliserons Mistral-7B. Vous pouvez utiliser la commande suivante pour télécharger le modèle au format GGUF.
 
 ```bash
 # Exemple de commande pour télécharger un modèle
-git lfs install
-git clone https://huggingface.co/mistralai/Mistral-7B-v0.1
+wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF/resolve/main/mistral-7b-instruct-v0.1.Q4_K_M.gguf?download=true
 ```
 
 ### Upload du Modèle dans MinIO
