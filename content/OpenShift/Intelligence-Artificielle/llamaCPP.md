@@ -22,8 +22,7 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants :
 2. **MinIO** : Un serveur MinIO configuré pour stocker vos modèles.
 3. **Outils CLI** : `oc` (OpenShift CLI) et `kubectl` pour interagir avec votre cluster.
 
-NOTE: Toute les actions ci-dessous seront réalisées dans le namespace myllm. Si vous ré
-
+NOTE: Toute les actions ci-dessous seront réalisées dans le namespace myllm. Si vous utilisez un autres namespace mettez à jour les URL/namespace en conséquence.
 
 ## Partie 1 : Téléchargement et Upload du Modèle
 
