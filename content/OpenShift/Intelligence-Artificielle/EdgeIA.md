@@ -69,4 +69,6 @@ En adoptant ces technologies, les entreprises peuvent non seulement améliorer l
 
 L'avenir de l'Edge IA s'annonce prometteur, et avec les outils et les technologies disponibles aujourd'hui, les possibilités sont presque illimitées. Il est temps pour les entreprises de saisir ces opportunités et de se positionner à l'avant-garde de cette révolution technologique.
 
+---
+
 **Auteur : [Romain GASQUET](https://www.linkedin.com/in/romain-gasquet/)**
