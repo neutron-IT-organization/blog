@@ -45,6 +45,7 @@ Le modèle Llama 3.2 est un modèle à accès contrôlé ("gated model"). Pour l
  * Copiez le jeton généré (il commence par **`hf_...`**).
 #### Étape 2 : S'authentifier dans le Terminal 
 Pour que Git puisse utiliser votre jeton, vous devez vous connecter via le terminal de votre machine.
+
  * Installez l'interface en ligne de commande de Hugging Face si ce n'est pas déjà fait :
 ```Shell
 pip install -U "huggingface_hub[cli]"
@@ -54,7 +55,7 @@ pip install -U "huggingface_hub[cli]"
 huggingface-cli login
 ```
   * Collez votre jeton d'accès lorsque vous y êtes invité et appuyez sur Entrée.
-#### Étape 4 : Cloner les Dépôts des Modèles 
+#### Étape 3 : Cloner les Dépôts des Modèles 
 Maintenant que tout est configuré, vous pouvez cloner les deux dépôts avec les commandes suivantes.
 ```Shell
 # Cloner le modèle Llama 3.2 Instruct
@@ -120,17 +121,22 @@ Configuration via l'Interface d'OpenShift AI
 La connexion se fait en deux temps, directement dans l'interface graphique :
 
 #### 2.3.1 Créer une Connexion de Données : 
-Dans votre projet "Data Science" sur OpenShift, allez dans la section "Connexions de données" et cliquez sur "Ajouter une connexion de données". Remplissez les champs avec les informations de votre serveur MinIO :
+Dans votre projet sur OpenShift AI, allez dans la section "Connexions de données" et cliquez sur "Ajouter une connexion de données". Remplissez les champs avec les informations de votre serveur MinIO :
 
 Nom de la connexion : Un nom descriptif (ex: Connexion MinIO Projet RAG).
+
 Access key ID : Votre clé d'accès MinIO.
+
 Secret access key : Votre clé secrète MinIO.
+
 Endpoint : L'URL de votre service MinIO.
 
 ![Architecture RAG](./img/Capture_connections_1.png){: .scaled-image } 
 ![Architecture RAG](./img/Capture_connections_2.png){: .scaled-image } 
 ![Architecture RAG](./img/Capture_connections_3.png){: .scaled-image } 
-#### 2.3.1 Lier la Connexion au Workbench : 
+
+#### 2.3.2 Lier la Connexion au Workbench : 
+
 Lors de la configuration de votre workbench (ou en le modifiant), descendez jusqu'à la section "Connexions de données". Sélectionnez dans la liste déroulante la connexion que vous venez de créer.
 
 ![Architecture RAG](./img/Capture_connections_4.png){: .scaled-image } 
@@ -139,7 +145,8 @@ Lors de la configuration de votre workbench (ou en le modifiant), descendez jusq
 
 En faisant cela, OpenShift AI va automatiquement injecter les identifiants de cette connexion comme variables d'environnement (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_ENDPOINT) dans l'environnement de votre notebook.
 
-Code d'Utilisation des Variables
+#### 2.3.3 Code d'Utilisation des Variables :
+
 Le code Python ci-dessous peut alors lire ces variables de manière sécurisée grâce à os.getenv(), sans jamais exposer les identifiants dans le code.
 ```python
 import os
@@ -442,7 +449,7 @@ while True:
 ```
 
  -> Résultats :
- ![Architecture RAG](./img/Capture_RAG.png){: .scaled-image } 
+ ![Architecture RAG](./img/Capture_RAG.png)
 ## Conclusion
 Cet article vous a guidé à travers la mise en place d'un système RAG performant, déconnecté et entièrement open-source. Vous avez appris à préparer les modèles, à les centraliser sur MinIO, à construire un pipeline d'ingestion de données sémantique et à assembler une chaîne de génération avancée. La clé est maintenant d'expérimenter avec vos propres documents, d'ajuster les paramètres du prompt ou même de tester différents retrievers pour affiner encore plus les performances de votre assistant IA.
 Dans cet exemple, j’ai utilisé le modèle Llama 3B de Meta-Llama, qui reste relativement léger. Bien qu’il permette d’illustrer le fonctionnement général du système, ses capacités sont limitées et ne permettent pas toujours d’obtenir des réponses puissantes ou très détaillées. En utilisant un modèle plus performant (comme Llama 7B, Mistral 7B ou Mixtral), vous pourrez obtenir des résultats bien plus pertinents et qualitatifs.
