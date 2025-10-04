@@ -1,0 +1,1822 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://blog.neutron-it.fr/OpenShift/Intelligence-Artificielle/rag_llama_minio_blog/">
+      
+      
+        <link rel="prev" href="../llamaCPP/">
+      
+      
+        <link rel="next" href="../../Operator/Vaultwarden/">
+      
+      
+      <link rel="icon" href="../../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Mise en place d'un RAG déconnecté sur OpenShift AI - </title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="neutron-it" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#introduction" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../../.." title="" class="md-header__button md-logo" aria-label="" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Mise en place d'un RAG déconnecté sur OpenShift AI
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="" class="md-nav__button md-logo" aria-label="" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Accueil
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tous les articles
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    BootC
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            BootC
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../BootC/MinIO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déployer MinIO avec BootC
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    OpenShift
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            OpenShift
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Configuration/openshift-image-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Comment exposer la registry interne OpenShift ?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Intelligence Artificielle
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Intelligence Artificielle
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CVAT-YOLO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    De l'Annotation à la Détection : Entraîner un Modèle YOLO sur OpenShift AI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DeepSeek/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déploiement de DeepSeek sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../EdgeIA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    L'Edge IA dans l'écosystème RedHat
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ObjectDetection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Entraînement et évaluation d'un modèle YOLO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SharedGPU/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration de GPU sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llamaCPP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déploiement de modèle en inférence sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Mise en place d'un RAG déconnecté sur OpenShift AI
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mise en place d'un RAG déconnecté sur OpenShift AI
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Source
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-preparation-de-lenvironnement-et-des-modeles" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Préparation de l'Environnement et des Modèles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Préparation de l&#39;Environnement et des Modèles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-telechargement-des-modeles-depuis-hugging-face" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1. Téléchargement des Modèles depuis Hugging Face
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-centralisation-sur-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.2. Centralisation sur MinIO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-initialisation-du-notebook-et-connexion-aux-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Initialisation du Notebook et Connexion aux Données
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Initialisation du Notebook et Connexion aux Données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-installation-des-dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1. Installation des Dépendances
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-assurer-le-fonctionnement-hors-ligne-nltk" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2. Assurer le fonctionnement hors ligne (NLTK)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-connexion-a-minio-et-recuperation-des-modeles" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3. Connexion à MinIO et Récupération des Modèles
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-chargement-et-configuration-des-modeles-ia" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Chargement et Configuration des Modèles IA
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pipeline-dingestion-des-donnees-le-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Pipeline d'Ingestion des Données (Le "Retrieval")
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Pipeline d&#39;Ingestion des Données (Le &#34;Retrieval&#34;)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-chargement-et-extraction-des-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1. Chargement et Extraction des Documents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-decoupage-semantique-du-texte" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2. Découpage Sémantique du Texte
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-vectorisation-et-stockage" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3. Vectorisation et Stockage
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-construction-de-la-chaine-de-generation-le-augmented-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Construction de la Chaîne de Génération (Le "Augmented Generation")
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-iteration-et-comparaison-des-resultats" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Itération et Comparaison des Résultats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operator
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            Operator
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Operator/Vaultwarden/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Création d'un Operator sur OpenShift avec Vaultwarden
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RealTime
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            RealTime
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../RealTime/RealTime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utiliser les capacités temps réel d'OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Source
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-preparation-de-lenvironnement-et-des-modeles" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Préparation de l'Environnement et des Modèles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Préparation de l&#39;Environnement et des Modèles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-telechargement-des-modeles-depuis-hugging-face" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1. Téléchargement des Modèles depuis Hugging Face
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-centralisation-sur-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.2. Centralisation sur MinIO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-initialisation-du-notebook-et-connexion-aux-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Initialisation du Notebook et Connexion aux Données
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Initialisation du Notebook et Connexion aux Données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-installation-des-dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1. Installation des Dépendances
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-assurer-le-fonctionnement-hors-ligne-nltk" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2. Assurer le fonctionnement hors ligne (NLTK)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-connexion-a-minio-et-recuperation-des-modeles" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3. Connexion à MinIO et Récupération des Modèles
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-chargement-et-configuration-des-modeles-ia" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Chargement et Configuration des Modèles IA
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pipeline-dingestion-des-donnees-le-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Pipeline d'Ingestion des Données (Le "Retrieval")
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Pipeline d&#39;Ingestion des Données (Le &#34;Retrieval&#34;)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-chargement-et-extraction-des-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1. Chargement et Extraction des Documents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-decoupage-semantique-du-texte" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2. Découpage Sémantique du Texte
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-vectorisation-et-stockage" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3. Vectorisation et Stockage
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-construction-de-la-chaine-de-generation-le-augmented-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Construction de la Chaîne de Génération (Le "Augmented Generation")
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-iteration-et-comparaison-des-resultats" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Itération et Comparaison des Résultats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <a href="../../../tags/#tag:ia" class="md-tag">IA</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:llm" class="md-tag">LLM</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:langchain" class="md-tag">LangChain</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:llama-3" class="md-tag">Llama 3</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:minio" class="md-tag">MinIO</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:openshift" class="md-tag">OpenShift</a>
+      
+    
+      
+      
+      
+        <a href="../../../tags/#tag:rag" class="md-tag">RAG</a>
+      
+    
+  </nav>
+
+
+
+<h1 id="mise-en-place-dun-rag-deconnecte-sur-openshift-ai">Mise en place d'un RAG déconnecté sur OpenShift AI</h1>
+<p><img alt="Architecture RAG" src="../img/schema-rag-complet-2.png" /></p>
+<h2 id="introduction">Introduction</h2>
+<p>Le RAG (Retrieval-Augmented Generation) est une technique puissante qui permet de connecter un Grand Modèle de Langage (LLM) à une base de connaissance externe. Cela permet au modèle de fournir des réponses précises et factuelles basées sur des documents spécifiques, plutôt que sur ses connaissances générales.</p>
+<p>Cet article vous guidera à travers les étapes pour construire, sur la plateforme OpenShift AI, un système RAG complet et déconnecté d'Internet, en utilisant le modèle Llama 3.2, des librairies open-source comme LangChain, et un stockage S3 compatible MinIO.</p>
+<hr />
+<h2 id="code-source">Code Source</h2>
+<p>Voici le dépôt GitHub qui contient tout le code utilisé pour l'implémentation de ce RAG. Vous y trouverez le notebook Jupyter complet, prêt à être exécuté.</p>
+<p><strong><a href="https://github.com/neutron-IT-organization/RAG">Accéder au notebook sur GitHub</a></strong></p>
+<h2 id="1-preparation-de-lenvironnement-et-des-modeles">1. Préparation de l'Environnement et des Modèles</h2>
+<p>La première phase consiste à récupérer tous les composants nécessaires et à les centraliser dans notre entrepôt de données MinIO.</p>
+<h3 id="11-telechargement-des-modeles-depuis-hugging-face">1.1. Téléchargement des Modèles depuis Hugging Face</h3>
+<p>Avant toute chose, nous devons télécharger les modèles qui seront au cœur de notre système. La méthode la plus simple et la plus robuste est de cloner directement leurs dépôts Git. Pour ce projet, nous utilisons :</p>
+<p><strong><code>meta-llama/Llama-3.2-3B-Instruct</code></strong> : Le LLM qui générera les réponses.
+<strong><code>sentence-transformers/all-MiniLM-L6-v2</code></strong> : Le modèle d'embedding qui transformera notre texte en vecteurs.
+Pour ce faire, vous devrez suivre quelques étapes de configuration la première fois.</p>
+<h4 id="etape-1-obtenir-un-jeton-dacces-token-hugging-face">Étape 1 : Obtenir un Jeton d'Accès (Token) Hugging Face</h4>
+<p>Le modèle Llama 3.2 est un modèle à accès contrôlé ("gated model"). Pour le télécharger, vous devez accepter ses conditions d'utilisation sur sa page Hugging Face et vous authentifier avec un jeton personnel.</p>
+<ul>
+<li>Connectez-vous à votre compte sur huggingface.co.</li>
+<li>Allez sur votre Profil -&gt; Settings -&gt; Access Tokens.</li>
+<li>Cliquez sur "New token", donnez-lui un nom (ex: <strong><code>openshift-downloader</code></strong>) et assignez-lui un rôle <strong><code>read</code></strong>.</li>
+<li>Copiez le jeton généré (il commence par <strong><code>hf_...</code></strong>).</li>
+</ul>
+<h4 id="etape-2-sauthentifier-dans-le-terminal">Étape 2 : S'authentifier dans le Terminal</h4>
+<p>Pour que Git puisse utiliser votre jeton, vous devez vous connecter via le terminal de votre machine.</p>
+<ul>
+<li>Installez l'interface en ligne de commande de Hugging Face si ce n'est pas déjà fait :</li>
+</ul>
+<pre><code class="language-Shell">pip install -U &quot;huggingface_hub[cli]&quot;
+</code></pre>
+<ul>
+<li>Lancez la commande de connexion :</li>
+</ul>
+<pre><code class="language-Shell">huggingface-cli login
+</code></pre>
+<ul>
+<li>Collez votre jeton d'accès lorsque vous y êtes invité et appuyez sur Entrée.</li>
+</ul>
+<h4 id="etape-3-cloner-les-depots-des-modeles">Étape 3 : Cloner les Dépôts des Modèles</h4>
+<p>Maintenant que tout est configuré, vous pouvez cloner les deux dépôts avec les commandes suivantes.</p>
+<pre><code class="language-Shell"># Cloner le modèle Llama 3.2 Instruct
+git clone https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+
+# Cloner le modèle d'embedding
+git clone https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+</code></pre>
+<h3 id="12-centralisation-sur-minio">1.2. Centralisation sur MinIO</h3>
+<p>Une fois les modèles et vos documents sources (PDF, etc.) sur votre machine, l'étape suivante est de les téléverser sur votre serveur MinIO. Cela crée une source de données unique et fiable pour notre application, la rendant indépendante de l'environnement d'exécution.</p>
+<p>Créez un bucket (par exemple <strong><code>neutronIT-rag</code></strong>) et organisez vos fichiers avec des préfixes clairs.</p>
+<h2 id="2-initialisation-du-notebook-et-connexion-aux-donnees">2. Initialisation du Notebook et Connexion aux Données</h2>
+<p>Nous passons maintenant au notebook Jupyter qui orchestre le RAG. </p>
+<h3 id="21-installation-des-dependances">2.1. Installation des Dépendances</h3>
+<p>Avant toute chose, exécutez la cellule suivante dans votre notebook pour installer toutes les librairies Python requises. Cette commande télécharge et installe l'ensemble des outils nécessaires au fonctionnement de notre RAG.</p>
+<pre><code class="language-python">!pip install huggingface_hub transformers accelerate sentencepiece bitsandbytes langchain langchain-community sentence-transformers chromadb pypdf unstructured pysqlite3-binary langchain-experimental minio
+</code></pre>
+<h3 id="22-assurer-le-fonctionnement-hors-ligne-nltk">2.2. Assurer le fonctionnement hors ligne (NLTK)</h3>
+<p>Pour que notre application soit véritablement déconnectée, nous devons nous assurer que toutes ses dépendances sont disponibles localement. L'outil SemanticChunker, que nous utiliserons plus tard, dépend de la librairie NLTK qui, par défaut, télécharge des paquets de données depuis Internet.</p>
+<p>Le code ci-dessous résout ce problème. Il doit être exécuté une première fois avec une connexion Internet. Il va télécharger les paquets punkt (pour la ponctuation) et stopwords (mots courants) dans un dossier local ./nltk_data. Lors des exécutions suivantes, même sans Internet, le script utilisera ce dossier local.</p>
+<pre><code class="language-python">import os
+import nltk
+import ssl
+
+nltk_data_dir = &quot;./nltk_data&quot;
+
+if not os.path.exists(nltk_data_dir):
+    print(f&quot;Le dossier '{nltk_data_dir}' est introuvable.&quot;)
+    print(&quot;Tentative de téléchargement des paquets NLTK requis ('punkt', 'stopwords')...&quot;)
+
+    os.makedirs(nltk_data_dir)
+
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+
+    nltk.download('punkt', download_dir=nltk_data_dir)
+    nltk.download('stopwords', download_dir=nltk_data_dir)
+
+    print(&quot;Téléchargement des paquets NLTK terminé.&quot;)
+else:
+    print(f&quot;Le dossier '{nltk_data_dir}' existe déjà. Aucune action de téléchargement n'est nécessaire.&quot;)
+
+if os.path.abspath(nltk_data_dir) not in nltk.data.path:
+    nltk.data.path.append(os.path.abspath(nltk_data_dir))
+
+print(&quot;Le script est configuré pour utiliser les paquets NLTK en mode déconnecté.&quot;)
+
+</code></pre>
+<h3 id="23-connexion-a-minio-et-recuperation-des-modeles">2.3. Connexion à MinIO et Récupération des Modèles</h3>
+<p>Maintenant que l'environnement est prêt, nous devons établir la connexion entre notre notebook et le serveur MinIO. Pour des raisons de sécurité, les identifiants (clés d'accès) ne sont jamais écrits directement dans le code. Sur OpenShift AI, la méthode recommandée est d'utiliser une "Connexion de données", qui stocke ces informations de manière sécurisée et les rend disponibles pour votre workbench.</p>
+<p>Configuration via l'Interface d'OpenShift AI
+La connexion se fait en deux temps, directement dans l'interface graphique :</p>
+<h4 id="231-creer-une-connexion-de-donnees">2.3.1 Créer une Connexion de Données :</h4>
+<p>Dans votre projet sur OpenShift AI, allez dans la section "Connexions de données" et cliquez sur "Ajouter une connexion de données". Remplissez les champs avec les informations de votre serveur MinIO :</p>
+<p>Nom de la connexion : Un nom descriptif (ex: Connexion MinIO Projet RAG).</p>
+<p>Access key ID : Votre clé d'accès MinIO.</p>
+<p>Secret access key : Votre clé secrète MinIO.</p>
+<p>Endpoint : L'URL de votre service MinIO.</p>
+<p><img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_1.png" /> 
+<img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_2.png" /> 
+<img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_3.png" /> </p>
+<h4 id="232-lier-la-connexion-au-workbench">2.3.2 Lier la Connexion au Workbench :</h4>
+<p>Lors de la configuration de votre workbench (ou en le modifiant), descendez jusqu'à la section "Connexions de données". Sélectionnez dans la liste déroulante la connexion que vous venez de créer.</p>
+<p><img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_4.png" /> 
+<img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_5.png" /> 
+<img alt="Architecture RAG" class="scaled-image" src="../img/Capture_connections_6.png" /> </p>
+<p>En faisant cela, OpenShift AI va automatiquement injecter les identifiants de cette connexion comme variables d'environnement (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_ENDPOINT) dans l'environnement de votre notebook.</p>
+<h4 id="233-code-dutilisation-des-variables">2.3.3 Code d'Utilisation des Variables :</h4>
+<p>Le code Python ci-dessous peut alors lire ces variables de manière sécurisée grâce à os.getenv(), sans jamais exposer les identifiants dans le code.</p>
+<pre><code class="language-python">import os
+from minio import Minio
+from minio.error import S3Error
+
+# --- Configuration MinIO ---
+MINIO_BUCKET_NAME = &quot;neutronIT-rag&quot;
+Access_key = os.getenv(&quot;AWS_ACCESS_KEY_ID&quot;)
+Secret_key = os.getenv(&quot;AWS_SECRET_ACCESS_KEY&quot;)
+s3_endpoint = os.getenv(&quot;AWS_S3_ENDPOINT&quot;)
+
+# --- Chemins locaux et MinIO ---
+LLM_MINIO_PREFIX = &quot;Meta-Llama-3.2-3B-Instruct/&quot;
+LLM_LOCAL_PATH = &quot;./models/Meta-Llama-3.2-3B-Instruct&quot;
+
+EMBEDDING_MINIO_PREFIX = &quot;all-MiniLM-L6-v2/&quot;
+EMBEDDING_LOCAL_PATH = &quot;./models/all-MiniLM-L6-v2&quot;
+
+def download_model_via_streaming(client, bucket, prefix, local_path):
+    &quot;&quot;&quot;
+    Télécharge les fichiers via streaming pour une utilisation mémoire minimale.
+    &quot;&quot;&quot;
+    if not os.path.exists(local_path):
+        print(f&quot;-&gt; Le dossier '{local_path}' n'existe pas. Début du téléchargement de '{prefix}'...&quot;)
+        os.makedirs(local_path, exist_ok=True)
+        try:
+            objects = client.list_objects(bucket, prefix=prefix, recursive=True)
+            files_to_download = [obj for obj in objects if not obj.object_name.endswith('/')]
+
+            for obj in files_to_download:
+                file_name = os.path.relpath(obj.object_name, prefix)
+                local_file_path = os.path.join(local_path, file_name)
+
+                if not os.path.exists(os.path.dirname(local_file_path)):
+                    os.makedirs(os.path.dirname(local_file_path))
+
+                response = None
+                try:
+                    response = client.get_object(bucket, obj.object_name)
+                    with open(local_file_path, 'wb') as file_data:
+                        for chunk in response.stream(amt=1024*1024):
+                            file_data.write(chunk)
+                finally:
+                    if response:
+                        response.close()
+                        response.release_conn()
+        except S3Error as exc:
+            print(f&quot;   Une erreur S3 est survenue pour {prefix}: {exc}&quot;)
+            raise
+    else:
+        print(f&quot;-&gt; Le modèle dans '{local_path}' existe déjà.&quot;)
+
+# --- Exécution du téléchargement ---
+try:
+    minio_client = Minio(s3_endpoint, access_key=Access_key, secret_key=Secret_key, secure=False)
+    print(&quot;Connexion à MinIO réussie.&quot;)
+
+    download_model_via_streaming(minio_client, MINIO_BUCKET_NAME, LLM_MINIO_PREFIX, LLM_LOCAL_PATH)
+    download_model_via_streaming(minio_client, MINIO_BUCKET_NAME, EMBEDDING_MINIO_PREFIX, EMBEDDING_LOCAL_PATH)
+
+except Exception as e:
+    print(f&quot;Une erreur est survenue lors de la phase de téléchargement : {e}&quot;)
+
+print(&quot;\n Tous les modèles sont vérifiés et prêts localement.&quot;)
+</code></pre>
+<p>-&gt; Résultat :</p>
+<p><img alt="Architecture RAG" class="scaled-image" src="../img/Capture_Connexion_MinIO.png" /> </p>
+<h2 id="3-chargement-et-configuration-des-modeles-ia">3. Chargement et Configuration des Modèles IA</h2>
+<p>Avec les fichiers de modèles disponibles localement, nous pouvons maintenant les charger en mémoire.</p>
+<p>Pour le LLM, une technique de quantification 4-bit (<strong><code>BitsAndBytesConfig</code></strong>) est utilisée. Elle réduit drastiquement l'empreinte mémoire du modèle sur le GPU, le rendant utilisable sur des configurations plus modestes, sans perte de performance significative.</p>
+<pre><code class="language-python">import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+
+# 1. Configuration de la quantification 4-bit
+nf4_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type=&quot;nf4&quot;,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
+
+# 2. Chargement du tokenizer du LLM
+print(f&quot;Chargement du tokenizer depuis le chemin local : {LLM_LOCAL_PATH}...&quot;)
+tokenizer = AutoTokenizer.from_pretrained(
+    LLM_LOCAL_PATH,
+    trust_remote_code=True,
+    local_files_only=True
+)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+# 3. Chargement du modèle LLM quantifié
+print(f&quot;Chargement du modèle depuis {LLM_LOCAL_PATH} avec quantisation 4-bit...&quot;)
+model = AutoModelForCausalLM.from_pretrained(
+    LLM_LOCAL_PATH,
+    quantization_config=nf4_config,
+    device_map=&quot;auto&quot;,
+    trust_remote_code=True,
+    torch_dtype=torch.bfloat16,
+    low_cpu_mem_usage=True,
+    local_files_only=True
+)
+print(&quot;Modèle LLM chargé avec succès !&quot;)
+
+# 4. Chargement du modèle d'embedding
+embeddings = SentenceTransformerEmbeddings(
+    model_name=EMBEDDING_LOCAL_PATH, 
+    model_kwargs={'device': 'cuda'}
+)
+print(&quot;Modèle d'embedding chargé avec succès !&quot;)
+</code></pre>
+<p>-&gt; Résultats :
+ <img alt="Architecture RAG" class="scaled-image" src="../img/Capture_Chargement_modele.png" /> </p>
+<h2 id="4-pipeline-dingestion-des-donnees-le-retrieval">4. Pipeline d'Ingestion des Données (Le "Retrieval")</h2>
+<p><img alt="Architecture RAG" class="scaled-image" src="../img/schema-MiniLM.png" /> </p>
+<p>Cette étape transforme nos documents bruts en une base de connaissance interrogeable. Elle se déroule en trois temps : l'extraction du texte, le découpage sémantique, et enfin la vectorisation.</p>
+<h3 id="41-chargement-et-extraction-des-documents">4.1. Chargement et Extraction des Documents</h3>
+<p>La première action consiste à récupérer les documents sources (ici, des PDF) depuis notre stockage MinIO. Le script parcourt le dossier <strong><code>documents/</code></strong>, télécharge chaque fichier localement, puis utilise la librairie <strong><code>PyPDFLoader</code></strong>. C'est la méthode <strong><code>loader.load()</code></strong> qui se charge d'ouvrir chaque PDF et d'en extraire le contenu textuel brut, page par page.</p>
+<pre><code class="language-python">from langchain_community.document_loaders import PyPDFLoader
+
+# 1. Chargement et extraction des documents PDF depuis MinIO
+PDF_DIRECTORY_ON_MINIO = &quot;documents/&quot;
+LOCAL_PDF_DOWNLOAD_DIR = &quot;./pdf_downloads/&quot;
+all_documents = []
+os.makedirs(LOCAL_PDF_DOWNLOAD_DIR, exist_ok=True)
+
+pdf_objects = minio_client.list_objects(MINIO_BUCKET_NAME, prefix=PDF_DIRECTORY_ON_MINIO, recursive=True)
+pdf_object_names = [obj.object_name for obj in pdf_objects if obj.object_name.lower().endswith('.pdf')]
+
+for pdf_object_name in pdf_object_names:
+    local_pdf_path = os.path.join(LOCAL_PDF_DOWNLOAD_DIR, os.path.basename(pdf_object_name))
+    if not os.path.exists(local_pdf_path):
+        minio_client.fget_object(MINIO_BUCKET_NAME, pdf_object_name, local_pdf_path)
+
+    # La librairie PyPDFLoader s'occupe ici de l'extraction du texte
+    loader = PyPDFLoader(local_pdf_path)
+    documents_from_this_pdf = loader.load()
+    all_documents.extend(documents_from_this_pdf)
+
+print(f&quot;Traitement terminé. Nombre total de pages prêtes pour le RAG : {len(all_documents)}&quot;)
+</code></pre>
+<p>-&gt; Résultats :
+ <img alt="Architecture RAG" class="scaled-image" src="../img/Capture_extraction.png" /> </p>
+<h3 id="42-decoupage-semantique-du-texte">4.2. Découpage Sémantique du Texte</h3>
+<p>Une fois le texte extrait, il est trop volumineux pour être envoyé tel quel à un LLM. Nous devons le diviser en plus petits morceaux ("chunks"). Plutôt qu'un découpage arbitraire, nous utilisons <strong><code>SemanticChunker</code></strong>. Cet outil analyse le texte et le coupe aux endroits où le sens change, créant ainsi des chunks plus cohérents et pertinents pour la recherche d'informations.</p>
+<pre><code class="language-python">from langchain_experimental.text_splitter import SemanticChunker
+
+# 2. Découpage sémantique
+print(&quot;Découpage des documents en chunks sémantiques...&quot;)
+text_splitter = SemanticChunker(embeddings, breakpoint_threshold_type=&quot;percentile&quot;)
+all_chunks = text_splitter.split_documents(all_documents)
+print(f&quot;Nombre total de chunks créés : {len(all_chunks)}&quot;)
+</code></pre>
+<p>-&gt; Résultats :
+ <img alt="Architecture RAG" class="scaled-image" src="../img/Capture_chunking.png" /> </p>
+<h3 id="43-vectorisation-et-stockage">4.3. Vectorisation et Stockage</h3>
+<p>C'est la dernière étape de la préparation. Chaque chunk de texte est transformé en un vecteur numérique (un "embedding") à l'aide de notre modèle <strong><code>all-MiniLM-L6-v2</code></strong>. Ces vecteurs sont ensuite stockés et indexés dans une base de données vectorielle, ChromaDB, qui nous permettra de retrouver efficacement les chunks les plus pertinents par rapport à une question.</p>
+<pre><code class="language-python">from langchain_community.vectorstores import Chroma
+
+# 3. Vectorisation et stockage dans ChromaDB
+print(&quot;Initialisation du Vector Store (ChromaDB) avec les chunks...&quot;)
+vectorstore = Chroma.from_documents(documents=all_chunks, embedding=embeddings)
+print(&quot;Vector Store prêt !&quot;)
+</code></pre>
+<h2 id="5-construction-de-la-chaine-de-generation-le-augmented-generation">5. Construction de la Chaîne de Génération (Le "Augmented Generation")</h2>
+<p>Maintenant que notre base de connaissance est prête, nous assemblons la chaîne RAG.</p>
+<pre><code class="language-python">from langchain_core.retrievers import BaseRetriever
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_community.llms import HuggingFacePipeline
+from transformers import pipeline
+from typing import List
+
+# 1. Retriever Personnalisé (`NeighborRetriever`)
+class NeighborRetriever(BaseRetriever):
+    vectorstore: Chroma
+    all_docs: List
+
+    def _get_relevant_documents(self, query: str, *, run_manager) -&gt; List:
+        best_docs = self.vectorstore.similarity_search(query, k=1)
+        if not best_docs: return []
+
+        try:
+            best_doc_index = [doc.page_content for doc in self.all_docs].index(best_docs[0].page_content)
+        except ValueError:
+            return best_docs
+
+        start_index = max(0, best_doc_index - 1)
+        end_index = min(len(self.all_docs), best_doc_index + 2)
+        return self.all_docs[start_index:end_index]
+
+retriever = NeighborRetriever(vectorstore=vectorstore, all_docs=all_chunks)
+print(&quot;Retriever à contexte enrichi (voisins) prêt !&quot;)
+
+
+# 2. Pipeline de génération et Prompt Template
+text_generation_pipeline = pipeline(&quot;text-generation&quot;, model=model, tokenizer=tokenizer, max_new_tokens=4096)
+llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
+
+prompt_template_str = &quot;&quot;&quot;&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+Tu es un assistant utile. Pour répondre, réfère-toi d'abord au CONTEXTE FOURNI.
+Si la réponse NE SE TROUVE PAS dans le contexte, utilise tes propres connaissances.
+Si tu ne connais pas la réponse, dis simplement que tu ne sais pas.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+Contexte:
+{context}
+
+Question: {input}&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+&quot;&quot;&quot;
+prompt = ChatPromptTemplate.from_template(prompt_template_str)
+
+
+# 3. Assemblage de la chaîne RAG
+document_chain = create_stuff_documents_chain(llm, prompt)
+retrieval_chain = create_retrieval_chain(retriever, document_chain)
+print(&quot;Chaîne RAG complète assemblée !&quot;)
+</code></pre>
+<h2 id="6-iteration-et-comparaison-des-resultats">6. Itération et Comparaison des Résultats</h2>
+<p>Le système est prêt. L'étape finale du notebook lance une boucle interactive où, pour chaque question de l'utilisateur, le script utilise d'abord le LLM pour reformuler et améliorer la question, la rendant plus précise pour la recherche. Ensuite, cette question optimisée est envoyée à la fois au LLM seul pour une réponse générale, et à la chaîne RAG pour une réponse basée sur le contexte de nos documents. Cela permet de comparer en temps réel la connaissance intrinsèque du modèle avec les réponses factuelles et précises fournies par le RAG.</p>
+<pre><code class="language-python">def transform_query_with_llm(question: str, model, tokenizer) -&gt; str:
+    transformation_prompt_template = &quot;&quot;&quot;&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+    Tu es un outil de reformulation de requêtes. Ton seul rôle est de réécrire la question de l'utilisateur pour la rendre optimale pour une recherche sémantique.
+    Règles strictes:
+    1. Ne réponds JAMAIS à la question.
+    2. Garde le sens original de la question.
+    3. Ta sortie doit être une et une seule question.
+    4. La question reformulée doit être concise.
+
+    Exemple 1:
+    Utilisateur: infos sur la sécurité openshift
+    Assistant: Quelles sont les meilleures pratiques de sécurité pour un cluster OpenShift ?
+
+    Exemple 2:
+    Utilisateur: tu peux me faire un résumé ?
+    Assistant: Quel est le résumé du document fourni ?
+
+    Exemple 3:
+    Utilisateur: c'est quoi les grands titre dont tu peux m'aider, en se basant sur le contexte?
+    Assistant: Quels sont les thèmes principaux abordés dans le document ?&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+    {question}&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+    &quot;&quot;&quot;
+    formatted_prompt = transformation_prompt_template.format(question=question)
+    inputs = tokenizer(formatted_prompt, return_tensors=&quot;pt&quot;).to(model.device)
+    outputs = model.generate(**inputs, max_new_tokens=150, pad_token_id=tokenizer.eos_token_id)
+    transformed_question = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+    return transformed_question.strip()
+
+
+def get_direct_llm_answer(question, model, tokenizer):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}]
+    prompt_for_direct_answer = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(prompt_for_direct_answer, return_tensors=&quot;pt&quot;).to(model.device)
+    outputs = model.generate(**inputs, max_new_tokens=4096, pad_token_id=tokenizer.eos_token_id)
+    answer = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+    return answer
+
+# --- Boucle d'interaction principale ---
+print(&quot;\n\n Système RAG prêt. Posez une question (tapez 'exit' pour quitter) :&quot;)
+while True:
+    try:
+        prompt_text = input(&quot;&gt;&gt;&gt; &quot;)
+        if prompt_text.lower() == 'exit':
+            break
+
+        print(&quot;\n--- Transformation de la question par le LLM ---&quot;)
+        transformed_query = transform_query_with_llm(prompt_text, model, tokenizer)
+        print(f&quot;Question transformée : '{transformed_query}'&quot;)
+
+        print(&quot;\n--- Réponse du Modèle Llama (Connaissances Générales) ---&quot;)
+        answer_direct = get_direct_llm_answer(transformed_query, model, tokenizer)
+        print(f&quot;Modèle Llama (Direct) : {answer_direct.strip()}&quot;)
+
+        print(&quot;\n--- Réponse du RAG (Basée sur le Contexte du Fichier) ---&quot;)
+        response_rag = retrieval_chain.invoke({&quot;input&quot;: transformed_query})
+        print(f&quot;Modèle RAG : {response_rag['answer'].strip()}&quot;)
+
+    except KeyboardInterrupt:
+        print(&quot;\nFermeture.&quot;)
+        break
+    except Exception as e:
+        print(f&quot;Une erreur est survenue : {e}&quot;)
+        break
+</code></pre>
+<p>-&gt; Résultats :
+ <img alt="Architecture RAG" src="../img/Capture_RAG.png" /></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Cet article vous a guidé à travers la mise en place d'un système RAG performant, déconnecté et entièrement open-source. Vous avez appris à préparer les modèles, à les centraliser sur MinIO, à construire un pipeline d'ingestion de données sémantique et à assembler une chaîne de génération avancée. La clé est maintenant d'expérimenter avec vos propres documents, d'ajuster les paramètres du prompt ou même de tester différents retrievers pour affiner encore plus les performances de votre assistant IA.
+Dans cet exemple, j’ai utilisé le modèle Llama 3B de Meta-Llama, qui reste relativement léger. Bien qu’il permette d’illustrer le fonctionnement général du système, ses capacités sont limitées et ne permettent pas toujours d’obtenir des réponses puissantes ou très détaillées. En utilisant un modèle plus performant (comme Llama 7B, Mistral 7B ou Mixtral), vous pourrez obtenir des résultats bien plus pertinents et qualitatifs.</p>
+<hr />
+<p><strong>Auteur : <a href="https://www.linkedin.com/in/mohamed-reda-bouamoud-1297a3248/">Mohamed-Reda BOUAMOUD</a></strong></p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 - 2025 Neutron IT
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://neutron-it.fr" target="_blank" rel="noopener" title="neutron-it.fr" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/neutron-IT-organization" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://quay.io/neutron-it" target="_blank" rel="noopener" title="quay.io" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/company/neutron-it" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "search.share", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

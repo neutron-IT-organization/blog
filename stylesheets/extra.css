@@ -1,0 +1,12 @@
+[data-md-color-scheme="neutron-it"] {
+  --md-primary-fg-color:        #0d002d;
+  --md-primary-fg-color--light: #0d002d;
+  --md-primary-fg-color--dark:  #0d002d;
+  --md-accent-fg-color: #ff0454;
+  --md-typeset-a-color: #747bcb;
+}
+
+.scaled-image {
+  max-width: 62.5% !important;
+  display: block; /* Optionnel pour éviter des problèmes d'alignement */
+}

@@ -1,0 +1,1800 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://blog.neutron-it.fr/BootC/MinIO/">
+      
+      
+        <link rel="prev" href="../../tags/">
+      
+      
+        <link rel="next" href="../../OpenShift/Configuration/openshift-image-registry/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Déployer MinIO avec BootC - </title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="neutron-it" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-introduction" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../.." title="" class="md-header__button md-logo" aria-label="" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Déployer MinIO avec BootC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="" class="md-nav__button md-logo" aria-label="" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Accueil
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tous les articles
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    BootC
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            BootC
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Déployer MinIO avec BootC
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déployer MinIO avec BootC
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Introduction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presentation-de-minio-et-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Présentation de MinIO et BootC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#importance-du-stockage-dobjets-et-des-conteneurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Importance du stockage d'objets et des conteneurs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-quest-ce-que-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Qu'est-ce que MinIO ?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Qu&#39;est-ce que MinIO ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-de-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description de MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avantages-et-caracteristiques-principales" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avantages et caractéristiques principales
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-quest-ce-que-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Qu'est-ce que BootC ?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Qu&#39;est-ce que BootC ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-de-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description de BootC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avantages-et-caracteristiques-principales_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avantages et caractéristiques principales
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Prérequis
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Prérequis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liste-des-elements-necessaires-avant-de-commencer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Liste des éléments nécessaires avant de commencer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-etapes-de-deploiement" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Étapes de déploiement
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Étapes de déploiement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-creer-le-containerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 1 : Créer le Containerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-creer-le-fichier-configtoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 2 : Créer le fichier config.toml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-construire-limage-bootc-locale-pour-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 3 : Construire l'image Bootc locale pour MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-4-creer-liso-pour-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 4 : Créer l'ISO pour MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-5-installer-centos-stream-9-avec-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 5 : Installer CentOS Stream 9 avec MinIO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-configuration-avancee-optionnel" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Configuration avancée (optionnel)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Configuration avancée (optionnel)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options-de-configuration-supplementaires" class="md-nav__link">
+    <span class="md-ellipsis">
+      Options de configuration supplémentaires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#securite-et-optimisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sécurité et optimisation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Conclusion
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Conclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recapitulatif-des-avantages-de-minio-et-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Récapitulatif des avantages de MinIO et BootC
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-ressources-supplementaires" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Ressources supplémentaires
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Ressources supplémentaires">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liens-vers-les-documentations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Liens vers les documentations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    OpenShift
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            OpenShift
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Configuration/openshift-image-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Comment exposer la registry interne OpenShift ?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Intelligence Artificielle
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Intelligence Artificielle
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/CVAT-YOLO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    De l'Annotation à la Détection : Entraîner un Modèle YOLO sur OpenShift AI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/DeepSeek/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déploiement de DeepSeek sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/EdgeIA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    L'Edge IA dans l'écosystème RedHat
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/ObjectDetection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Entraînement et évaluation d'un modèle YOLO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/SharedGPU/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration de GPU sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/llamaCPP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Déploiement de modèle en inférence sur OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Intelligence-Artificielle/rag_llama_minio_blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mise en place d'un RAG déconnecté sur OpenShift AI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operator
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            Operator
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/Operator/Vaultwarden/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Création d'un Operator sur OpenShift avec Vaultwarden
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RealTime
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            RealTime
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../OpenShift/RealTime/RealTime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utiliser les capacités temps réel d'OpenShift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Introduction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presentation-de-minio-et-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Présentation de MinIO et BootC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#importance-du-stockage-dobjets-et-des-conteneurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Importance du stockage d'objets et des conteneurs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-quest-ce-que-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Qu'est-ce que MinIO ?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Qu&#39;est-ce que MinIO ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-de-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description de MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avantages-et-caracteristiques-principales" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avantages et caractéristiques principales
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-quest-ce-que-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Qu'est-ce que BootC ?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Qu&#39;est-ce que BootC ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-de-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description de BootC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avantages-et-caracteristiques-principales_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avantages et caractéristiques principales
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Prérequis
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Prérequis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liste-des-elements-necessaires-avant-de-commencer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Liste des éléments nécessaires avant de commencer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-etapes-de-deploiement" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Étapes de déploiement
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Étapes de déploiement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-creer-le-containerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 1 : Créer le Containerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-creer-le-fichier-configtoml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 2 : Créer le fichier config.toml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-construire-limage-bootc-locale-pour-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 3 : Construire l'image Bootc locale pour MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-4-creer-liso-pour-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 4 : Créer l'ISO pour MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-5-installer-centos-stream-9-avec-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Étape 5 : Installer CentOS Stream 9 avec MinIO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-configuration-avancee-optionnel" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Configuration avancée (optionnel)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Configuration avancée (optionnel)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options-de-configuration-supplementaires" class="md-nav__link">
+    <span class="md-ellipsis">
+      Options de configuration supplémentaires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#securite-et-optimisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sécurité et optimisation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Conclusion
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Conclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recapitulatif-des-avantages-de-minio-et-bootc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Récapitulatif des avantages de MinIO et BootC
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-ressources-supplementaires" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Ressources supplémentaires
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Ressources supplémentaires">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liens-vers-les-documentations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Liens vers les documentations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <a href="../../tags/#tag:bootc" class="md-tag">BootC</a>
+      
+    
+      
+      
+      
+        <a href="../../tags/#tag:minio" class="md-tag">MinIO</a>
+      
+    
+      
+      
+      
+        <a href="../../tags/#tag:storage" class="md-tag">Storage</a>
+      
+    
+  </nav>
+
+
+
+<p><img alt="" src="../img/minio-banner.png" /></p>
+<h1 id="deployer-minio-avec-bootc">Déployer MinIO avec BootC</h1>
+<h2 id="1-introduction">1. Introduction</h2>
+<h3 id="presentation-de-minio-et-bootc">Présentation de MinIO et BootC</h3>
+<p>MinIO est une solution de stockage d'objets open-source qui permet de créer des infrastructures de stockage évolutives et résilientes. BootC, quant à lui, est un outil de gestion de conteneurs qui facilite le déploiement et la gestion des applications conteneurisées.</p>
+<h3 id="importance-du-stockage-dobjets-et-des-conteneurs">Importance du stockage d'objets et des conteneurs</h3>
+<p>Le stockage d'objets est essentiel pour gérer de grandes quantités de données non structurées, tandis que les conteneurs permettent de déployer des applications de manière cohérente et isolée. La combinaison de MinIO et BootC offre une solution puissante pour le stockage et la gestion des données dans des environnements modernes.</p>
+<h2 id="2-quest-ce-que-minio">2. Qu'est-ce que MinIO ?</h2>
+<h3 id="description-de-minio">Description de MinIO</h3>
+<p>MinIO est un serveur de stockage d'objets compatible avec le protocole Amazon S3. Il est conçu pour être léger, rapide et facile à déployer. MinIO peut être utilisé pour stocker des photos, des vidéos, des sauvegardes et d'autres types de données non structurées.</p>
+<h3 id="avantages-et-caracteristiques-principales">Avantages et caractéristiques principales</h3>
+<ul>
+<li><strong>Compatibilité S3</strong> : MinIO est entièrement compatible avec le protocole Amazon S3, ce qui permet une intégration facile avec les outils et applications existants.</li>
+<li><strong>Haute performance</strong> : MinIO est optimisé pour offrir des performances élevées en termes de débit et de latence.</li>
+<li><strong>Évolutivité</strong> : MinIO peut être déployé sur un seul nœud ou sur plusieurs nœuds pour répondre aux besoins de stockage croissants.</li>
+<li><strong>Sécurité</strong> : MinIO offre des fonctionnalités de sécurité robustes, telles que le chiffrement des données et l'authentification.</li>
+</ul>
+<h2 id="3-quest-ce-que-bootc">3. Qu'est-ce que BootC ?</h2>
+<h3 id="description-de-bootc">Description de BootC</h3>
+<p>BootC est un outil de gestion de conteneurs qui simplifie le déploiement, la gestion et l'orchestration des applications conteneurisées. Il est conçu pour être léger et facile à utiliser, tout en offrant des fonctionnalités puissantes pour les environnements de production. BootC est au cœur des conteneurs amorçables, qui permettent de gérer des systèmes d'exploitation immuables via des images de conteneurs OCI/Docker.</p>
+<h3 id="avantages-et-caracteristiques-principales_1">Avantages et caractéristiques principales</h3>
+<ul>
+<li><strong>Approche unifiée pour DevOps</strong> : BootC permet de gérer l'ensemble du système d'exploitation via des outils et concepts basés sur les conteneurs, y compris GitOps et CI/CD.</li>
+<li><strong>Sécurité simplifiée</strong> : Les mises à jour de sécurité peuvent être appliquées à l'ensemble du système d'exploitation, y compris le noyau, les pilotes et le chargeur d'amorçage, en utilisant des outils de sécurité avancés pour les conteneurs.</li>
+<li><strong>Intégration rapide et écosystème</strong> : BootC s'intègre dans un vaste écosystème d'outils et de technologies autour des conteneurs, permettant de déployer et de gérer des systèmes Linux à grande échelle.</li>
+</ul>
+<h2 id="4-prerequis">4. Prérequis</h2>
+<h3 id="liste-des-elements-necessaires-avant-de-commencer">Liste des éléments nécessaires avant de commencer</h3>
+<ul>
+<li><strong>Podman</strong> installé sur votre système</li>
+<li>Espace disque suffisant pour le stockage des conteneurs et des fichiers de sortie</li>
+</ul>
+<h2 id="5-etapes-de-deploiement">5. Étapes de déploiement</h2>
+<h3 id="etape-1-creer-le-containerfile">Étape 1 : Créer le <code>Containerfile</code></h3>
+<p>Adaptez le <code>Containerfile</code> suivant à vos besoins :</p>
+<pre><code class="language-dockerfile">FROM quay.io/centos/centos:stream9 as builder
+
+RUN dnf install -y wget
+RUN wget https://dl.min.io/server/minio/release/linux-amd64/minio
+
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+COPY --from=builder --chmod=755 /minio /usr/local/bin/minio
+
+RUN cat &lt;&lt;'EOF' &gt; /etc/systemd/system/minio.service
+[Unit]
+Description=MinIO
+Documentation=https://min.io/docs/minio/linux/index.html
+Wants=network-online.target
+After=network-online.target
+AssertFileIsExecutable=/usr/local/bin/minio
+
+[Service]
+WorkingDirectory=/usr/local
+
+User=minio
+Group=minio
+ProtectProc=invisible
+
+EnvironmentFile=-/etc/default/minio
+ExecStartPre=/bin/bash -c &quot;if [ -z \&quot;$MINIO_VOLUMES\&quot; ]; then echo \&quot;Variable MINIO_VOLUMES not set in /etc/default/minio\&quot;; exit 1; fi&quot;
+ExecStart=/usr/local/bin/minio server $MINIO_OPTS $MINIO_VOLUMES
+
+# MinIO RELEASE.2023-05-04T21-44-30Z adds support for Type=notify (https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=)
+# This may improve systemctl setups where other services use `After=minio.server`
+# Uncomment the line to enable the functionality
+# Type=notify
+
+# Let systemd restart this service always
+Restart=always
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+
+# Specifies the maximum number of threads this process can create
+TasksMax=infinity
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=infinity
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+RUN cat &lt;&lt;'EOF' &gt; /etc/default/minio
+# MINIO_ROOT_USER and MINIO_ROOT_PASSWORD sets the root account for the MinIO server.
+# This user has unrestricted permissions to perform S3 and administrative API operations on any resource in the deployment.
+# Omit to use the default values 'minioadmin:minioadmin'.
+# MinIO recommends setting non-default values as a best practice, regardless of environment
+
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+
+# MINIO_VOLUMES sets the storage volume or path to use for the MinIO server.
+
+MINIO_VOLUMES=&quot;/home/minio&quot;
+
+# MINIO_OPTS sets any additional commandline options to pass to the MinIO server.
+# For example, `--console-address :9001` sets the MinIO Console listen port
+MINIO_OPTS=&quot;--console-address :9001&quot;
+EOF
+
+WORKDIR /home
+
+RUN mkdir minio
+
+RUN systemctl enable minio.service
+</code></pre>
+<h3 id="etape-2-creer-le-fichier-configtoml">Étape 2 : Créer le fichier <code>config.toml</code></h3>
+<p>Adaptez le fichier <code>config.toml</code> suivant à vos besoins : </p>
+<pre><code class="language-toml">[customizations.installer.kickstart]
+contents = &quot;&quot;&quot;
+# Non-interactive text mode installation
+text --non-interactive
+reboot --eject
+
+# Set language and keyboard layout
+lang en_US
+keyboard --vckeymap=fr --xlayouts='fr'
+
+# Network configuration
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+autopart --noswap --type=lvm --fstype=xfs 
+
+# Create a user with SSH key
+user --name=minio --password=toto --shell=/bin/bash --groups=wheel
+
+%post
+# Configure sudo for the user
+echo &quot;minio ALL=(ALL) NOPASSWD: ALL&quot; &gt; /etc/sudoers.d/minio
+chmod 440 /etc/sudoers.d/minio
+%end
+&quot;&quot;&quot;
+</code></pre>
+<h3 id="etape-3-construire-limage-bootc-locale-pour-minio">Étape 3 : Construire l'image Bootc locale pour MinIO</h3>
+<ol>
+<li>Définissez vos identifiants Red Hat et le nom de l'image :</li>
+</ol>
+<p><code>bash
+   export IMAGE_NAME=minio-centos-bootc</code></p>
+<ol>
+<li>Exécutez la commande <code>podman build</code> pour créer l'image Bootc pour MinIO :</li>
+</ol>
+<p><code>bash
+   sudo podman build -t "${IMAGE_NAME}" -f Containerfile</code></p>
+<p><strong>Remarque</strong> : Le <code>Containerfile</code> doit être présent dans le répertoire de travail.</p>
+<h3 id="etape-4-creer-liso-pour-minio">Étape 4 : Créer l'ISO pour MinIO</h3>
+<ol>
+<li>Définissez les variables nécessaires :</li>
+</ol>
+<p><code>bash
+   export CONFIG_PATH=&lt;votre_chemin&gt;/config.toml
+   export OUTPUT_DIR=&lt;chemin_vers_répertoire_de_sortie&gt;</code></p>
+<ol>
+<li>Exécutez la commande <code>podman run</code> pour générer l'ISO :</li>
+</ol>
+<p><code>bash
+   sudo podman run \
+       --rm \
+       -it \
+       --privileged \
+       --pull=newer \
+       --security-opt label=type:unconfined_t \
+       -v ${CONFIG_PATH}:/config.toml:ro \
+       -v ${OUTPUT_DIR}:/output \
+       -v /var/lib/containers/storage:/var/lib/containers/storage \
+       quay.io/centos-bootc/bootc-image-builder \
+       --type iso \
+       --use-librepo \
+       --local localhost/${IMAGE_NAME}</code></p>
+<p><strong>Remarques</strong> :
+   - Assurez-vous que <code>config.toml</code> est correctement configuré pour votre installation MinIO.
+   - Le répertoire de sortie doit être accessible en écriture pour stocker l'ISO résultant.
+   - L'option <code>--pull=newer</code> garantit l'utilisation de la dernière image <code>bootc-image-builder</code>.
+   - L'option <code>--security-opt label=type:unconfined_t</code> aide à éviter les problèmes liés à SELinux.</p>
+<h3 id="etape-5-installer-centos-stream-9-avec-minio">Étape 5 : Installer CentOS Stream 9 avec MinIO</h3>
+<ol>
+<li>
+<p><strong>Créer un support d'installation amorçable</strong> : Utilisez l'ISO généré pour créer un support d'installation amorçable (par exemple, une clé USB) à l'aide d'un outil comme Rufus (Windows) ou dd (Linux).</p>
+</li>
+<li>
+<p><strong>Démarrer à partir du support</strong> : Insérez le support d'installation dans votre système cible et démarrez à partir de celui-ci.</p>
+</li>
+<li>
+<p><strong>Suivre les instructions d'installation</strong> : Procédez à l'installation en suivant les instructions à l'écran.</p>
+</li>
+<li>
+<p><strong>Vérifier l'installation</strong> : Une fois l'installation terminée, vérifiez que MinIO est en cours d'exécution en contrôlant l'état du service :</p>
+</li>
+</ol>
+<p><code>bash
+   sudo systemctl status MinIO</code></p>
+<h2 id="6-configuration-avancee-optionnel">6. Configuration avancée (optionnel)</h2>
+<h3 id="options-de-configuration-supplementaires">Options de configuration supplémentaires</h3>
+<ul>
+<li><strong>Réplication</strong> : Configurez la réplication des données entre plusieurs nœuds MinIO pour une meilleure résilience.</li>
+<li><strong>Sécurité</strong> : Activez le chiffrement des données et configurez les politiques de sécurité pour protéger vos données.</li>
+</ul>
+<h3 id="securite-et-optimisation">Sécurité et optimisation</h3>
+<ul>
+<li><strong>Sauvegarde</strong> : Mettez en place des sauvegardes régulières pour protéger vos données contre les pertes.</li>
+<li><strong>Surveillance</strong> : Utilisez des outils de surveillance pour suivre les performances et la santé de votre déploiement MinIO.</li>
+</ul>
+<h2 id="7-conclusion">7. Conclusion</h2>
+<h3 id="recapitulatif-des-avantages-de-minio-et-bootc">Récapitulatif des avantages de MinIO et BootC</h3>
+<p>MinIO et BootC offrent une solution puissante et flexible pour le stockage et la gestion des données dans des environnements modernes. La combinaison de ces deux outils permet de créer des infrastructures de stockage évolutives, sécurisées et faciles à gérer.</p>
+<h2 id="8-ressources-supplementaires">8. Ressources supplémentaires</h2>
+<h3 id="liens-vers-les-documentations">Liens vers les documentations</h3>
+<ul>
+<li><a href="https://docs.min.io/">Documentation de MinIO</a></li>
+<li><a href="https://docs.fedoraproject.org/en-US/bootc/">Documentation de BootC</a></li>
+<li><a href="https://osbuild.org/docs/bootc/">Documentation d'OSBuild</a></li>
+</ul>
+<hr />
+<p><strong>Auteur : <a href="https://www.linkedin.com/in/romain-gasquet/">Romain GASQUET</a></strong></p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 - 2025 Neutron IT
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://neutron-it.fr" target="_blank" rel="noopener" title="neutron-it.fr" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/neutron-IT-organization" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://quay.io/neutron-it" target="_blank" rel="noopener" title="quay.io" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/company/neutron-it" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "search.share", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
